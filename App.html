@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نقشبند</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fustat:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#fafbf7;--card:#ffffff;--card-hover:#f5f6ef;--text:#1a2e1a;
+      --text-s:#5a6b5a;--text-m:#8a9a8a;--primary:#256f4c;--primary-l:#2d8a5e;
+      --primary-p:#e8f5ee;--accent:#AB8A5C;--secondary:#B59059;--surface:#DEE0C5;
+      --border:#e2e5d8;--shadow:rgba(37,111,76,0.08);--danger:#c0392b;
+      --counter-bg:#f0f2e8;
+    }
+    [data-theme="dark"]{
+      --bg:#141a16;--card:#1e2721;--card-hover:#253028;--text:#e8e6df;
+      --text-s:#9ca38f;--text-m:#6b7568;--primary:#3da876;--primary-l:#4ec98e;
+      --primary-p:#1e3328;--accent:#c4a06d;--secondary:#B59059;--surface:#2a3328;
+      --border:#2f3a31;--shadow:rgba(0,0,0,0.3);--danger:#e74c3c;
+      --counter-bg:#253028;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Noto Naskh Arabic',serif;background:#0f1610;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;overflow:hidden}
+    h1,h2,h3,h4,h5,h6{font-family:'Fustat',sans-serif}
+    .page-bg{width:100%;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .page-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(37,111,76,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(171,138,92,0.1) 0%,transparent 50%),linear-gradient(160deg,#0f1610 0%,#141e15 40%,#1a1a10 100%)}
+    .page-label{position:relative;z-index:1;color:#DEE0C5;font-family:'Fustat',sans-serif;font-size:13px;margin-bottom:14px;opacity:.6;letter-spacing:2px}
+    .phone-frame{position:relative;z-index:1;width:393px;height:852px;border-radius:48px;background:var(--bg);overflow:hidden;box-shadow:0 0 0 2px #2a3530,0 0 0 4px #1a2420,0 30px 80px rgba(0,0,0,0.5),inset 0 0 0 1px rgba(255,255,255,0.05);display:flex;flex-direction:column;transition:background .3s}
+    .status-bar{height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 8px;font-family:'Fustat',sans-serif;font-size:15px;font-weight:600;color:var(--text);flex-shrink:0;position:relative;z-index:10}
+    .status-bar .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:126px;height:34px;background:#000;border-radius:0 0 20px 20px}
+    .status-icons{display:flex;gap:6px;align-items:center}
+    .status-icons .material-symbols-rounded{font-size:17px}
+    .app-container{flex:1;position:relative;overflow:hidden}
+    .screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:0 20px 20px;opacity:0;transform:translateX(-30px);pointer-events:none;transition:opacity .3s ease,transform .3s ease;-webkit-overflow-scrolling:touch}
+    .screen::-webkit-scrollbar{display:none}
+    .screen.active{opacity:1;transform:translateX(0);pointer-events:auto}
+    .bottom-nav{height:72px;display:flex;align-items:center;justify-content:space-around;background:var(--card);border-top:1px solid var(--border);flex-shrink:0;padding-bottom:8px;transition:transform .3s,background .3s}
+    .bottom-nav.hidden{transform:translateY(100%)}
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 12px;border-radius:12px;transition:all .2s;-webkit-tap-highlight-color:transparent;border:none;background:none;font-family:'Fustat',sans-serif}
+    .nav-item .material-symbols-rounded{font-size:26px;color:var(--text-m);transition:color .2s}
+    .nav-item span:last-child{font-size:11px;color:var(--text-m);font-weight:500;transition:color .2s}
+    .nav-item.active .material-symbols-rounded{color:var(--primary)}
+    .nav-item.active span:last-child{color:var(--primary);font-weight:600}
+    .sub-header{display:flex;align-items:center;gap:12px;padding:4px 0 16px;flex-shrink:0;position:sticky;top:0;z-index:12;background:var(--bg)}
+    .back-btn{width:40px;height:40px;border-radius:12px;border:none;background:var(--surface);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+    .back-btn:active{transform:scale(.92)}
+    .sub-header h2{font-size:20px;font-weight:700;color:var(--text);flex:1}
+    .header-action{width:40px;height:40px;border-radius:12px;border:none;background:transparent;color:var(--text-s);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+    .header-action:active{transform:scale(.92)}
+    .header-action.fav-active{color:var(--danger)}
+
+    /* الرئيسية */
+    .app-brand{text-align:center;margin-bottom:20px}
+    .app-brand h1{font-size:32px;font-weight:700;color:var(--primary);line-height:1.2}
+    .app-brand p{font-size:13px;color:var(--text-s);margin-top:4px;font-weight:500}
+    .date-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:22px;flex-wrap:wrap}
+    .date-chip{font-size:12px;color:var(--text-s);background:var(--surface);padding:5px 12px;border-radius:8px;font-family:'Fustat',sans-serif;font-weight:500}
+    .progress-card{background:linear-gradient(135deg,var(--primary) 0%,#1a5c3a 100%);border-radius:20px;padding:22px;display:flex;align-items:center;gap:18px;margin-bottom:28px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(37,111,76,0.25)}
+    [data-theme="dark"] .progress-card{background:linear-gradient(135deg,#1a4a33 0%,#143828 100%);box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+    .progress-card::before{content:'';position:absolute;top:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(171,138,92,0.15)}
+    .progress-card::after{content:'';position:absolute;bottom:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.05)}
+    .progress-ring-wrap{position:relative;width:90px;height:90px;flex-shrink:0}
+    .progress-ring-wrap svg{transform:rotate(-90deg)}
+    .progress-ring-bg{fill:none;stroke:rgba(255,255,255,0.15);stroke-width:8}
+    .progress-ring-fill{fill:none;stroke:var(--accent);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .6s ease;filter:drop-shadow(0 0 4px rgba(171,138,92,0.5))}
+    .progress-ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
+    .progress-ring-text .num{font-family:'Fustat',sans-serif;font-size:26px;font-weight:700;line-height:1}
+    .progress-ring-text .label{font-size:10px;opacity:.8;margin-top:2px}
+    .progress-info{position:relative;z-index:1;color:#fff}
+    .progress-info h3{font-size:17px;font-weight:700;margin-bottom:4px}
+    .progress-info p{font-size:12px;opacity:.85;line-height:1.6}
+
+    .section-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+    .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    /* بطاقات الأوراد */
+    .wird-cards{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+    .wird-main-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden}
+    .wird-main-card:active{transform:scale(.98)}
+    .wird-main-card::before{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:0 0 0 80px;background:var(--primary-p);opacity:.5}
+    .wird-main-card.disabled{opacity:.5;cursor:default}
+    .wird-main-card.disabled:active{transform:none}
+    .wird-card-icon{width:48px;height:48px;border-radius:14px;background:var(--primary-p);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1}
+    .wird-card-icon .material-symbols-rounded{font-size:24px}
+    .wird-card-info{flex:1;position:relative;z-index:1}
+    .wird-card-info h4{font-size:16px;font-weight:700;color:var(--text);margin-bottom:0}
+    .wird-card-info p{font-size:12px;color:var(--text-m);margin-bottom:8px}
+    .wird-card-bar{width:100%;height:4px;border-radius:2px;background:var(--surface);overflow:hidden}
+    .wird-card-bar .fill{height:100%;border-radius:2px;background:var(--primary);transition:width .4s ease}
+    .wird-card-arrow{color:var(--text-m);flex-shrink:0;position:relative;z-index:1}
+    .wird-card-arrow .material-symbols-rounded{font-size:22px}
+    .coming-soon-badge{font-size:10px;color:var(--accent);background:rgba(171,138,92,0.12);padding:2px 8px;border-radius:6px;font-family:'Fustat',sans-serif;font-weight:600}
+
+    /* شاشة الورد */
+    .bismillah-header{text-align:center;padding:8px 0 20px;font-size:20px;color:var(--accent);font-weight:600;line-height:1.8}
+    .wird-header-progress{margin-bottom:12px;padding-bottom:14px;position:sticky;top:60px;z-index:11;background:var(--bg)}
+    .wird-header-progress .stats-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;color:var(--text-s)}
+    .wird-header-progress .stats-row strong{color:var(--primary)}
+    .wird-header-bar{width:100%;height:6px;border-radius:3px;background:var(--surface);overflow:hidden}
+    .wird-header-bar .fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .5s ease}
+    .adhkar-list{display:flex;flex-direction:column;gap:12px;padding-bottom:20px}
+    .adhkar-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;transition:all .2s}
+    .adhkar-item.completed-adhkar{}
+    .adhkar-text{font-size:16px;line-height:2.2;color:var(--text);margin-bottom:12px}
+    .verse{color:var(--accent);font-weight:500}
+    .adhkar-actions{display:flex;align-items:center;justify-content:space-between}
+    .adhkar-left{display:flex;align-items:center;gap:8px}
+    .copy-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text-s);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+    .copy-btn:active{transform:scale(.9)}
+    .copy-btn .material-symbols-rounded{font-size:18px}
+    .copy-btn.fav-active{color:var(--danger);border-color:rgba(192,57,43,0.35);background:rgba(192,57,43,0.08)}
+    .complete-btn.done{background:var(--primary);border-color:var(--primary);color:#fff}
+    .adhkar-count-label{font-size:12px;color:var(--text-m);font-family:'Fustat',sans-serif}
+    .counter-circle{width:52px;height:52px;border-radius:50%;background:var(--counter-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:all .15s;-webkit-tap-highlight-color:transparent;border:none;flex-shrink:0}
+    .counter-circle:active{transform:scale(.88)}
+    .counter-circle .counter-num{font-family:'Fustat',sans-serif;font-size:18px;font-weight:700;color:var(--text);z-index:1;position:relative}
+    .counter-circle .counter-ring{position:absolute;inset:0}
+    .counter-circle .counter-ring circle{fill:none;stroke-width:3;transform:rotate(-90deg);transform-origin:center}
+    .counter-circle .ring-bg{stroke:var(--border)}
+    .counter-circle .ring-fill{stroke:var(--primary);stroke-linecap:round;transition:stroke-dashoffset .3s ease}
+    .counter-circle.done{background:var(--primary)}
+    .counter-circle.done .counter-num{color:#fff}
+    .counter-circle.done .ring-fill{stroke:rgba(255,255,255,0.3)}
+    .counter-circle.done .ring-bg{stroke:rgba(255,255,255,0.15)}
+
+    /* البحث */
+    .search-input-wrap{position:relative;margin-bottom:20px}
+    .search-input-wrap .material-symbols-rounded{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-m);font-size:22px;pointer-events:none}
+    .search-input{width:100%;height:50px;border-radius:14px;border:1px solid var(--border);background:var(--card);padding:0 46px 0 16px;font-family:'Noto Naskh Arabic',serif;font-size:15px;color:var(--text);outline:none;transition:border-color .2s}
+    .search-input::placeholder{color:var(--text-m)}
+    .search-input:focus{border-color:var(--primary)}
+    .search-results{display:flex;flex-direction:column;gap:10px}
+    .search-result-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s}
+    .search-result-item:active{transform:scale(.98)}
+    .search-result-item .result-cat{font-size:11px;color:var(--primary);font-family:'Fustat',sans-serif;font-weight:600;margin-bottom:6px}
+    .search-result-item .result-text{font-size:14px;color:var(--text);line-height:1.8}
+    .search-result-item .result-text mark{background:var(--accent);color:#fff;border-radius:2px;padding:0 2px}
+    .empty-state{text-align:center;padding:48px 20px;color:var(--text-m)}
+    .empty-state .material-symbols-rounded{font-size:56px;margin-bottom:12px;opacity:.4}
+    .empty-state p{font-size:14px;line-height:1.8}
+
+    /* أورادي */
+    .my-wird-list{display:flex;flex-direction:column;gap:10px;padding-bottom:80px}
+    .my-wird-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;transition:all .2s}
+    .my-wird-card .my-wird-info{flex:1}
+    .my-wird-card .my-wird-info h4{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
+    .my-wird-card .my-wird-info p{font-size:13px;color:var(--text-s);line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .my-wird-card .my-wird-count{font-family:'Fustat',sans-serif;font-size:13px;color:var(--primary);font-weight:600;white-space:nowrap;text-align:center}
+    .my-wird-card .delete-wird-btn{width:36px;height:36px;border-radius:10px;border:none;background:transparent;color:var(--text-m);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+    .my-wird-card .delete-wird-btn:hover{color:var(--danger);background:rgba(192,57,43,0.08)}
+    .fab{position:absolute;bottom:20px;left:20px;width:56px;height:56px;border-radius:16px;background:var(--primary);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(37,111,76,0.3);transition:all .2s;z-index:5}
+    .fab:active{transform:scale(.9)}
+    .fab .material-symbols-rounded{font-size:28px}
+
+    /* إضافة ورد */
+    .add-wird-form{display:flex;flex-direction:column;gap:16px;padding-bottom:20px}
+    .form-group{display:flex;flex-direction:column;gap:6px}
+    .form-group label{font-size:13px;font-weight:600;color:var(--text-s);font-family:'Fustat',sans-serif}
+    .form-input{height:48px;border-radius:12px;border:1px solid var(--border);background:var(--card);padding:0 14px;font-family:'Noto Naskh Arabic',serif;font-size:15px;color:var(--text);outline:none;transition:border-color .2s}
+    .form-input:focus{border-color:var(--primary)}
+    .form-textarea{height:120px;border-radius:12px;border:1px solid var(--border);background:var(--card);padding:12px 14px;font-family:'Noto Naskh Arabic',serif;font-size:15px;color:var(--text);outline:none;resize:none;line-height:2;transition:border-color .2s}
+    .form-textarea:focus{border-color:var(--primary)}
+    .form-error{font-size:12px;color:var(--danger);display:none}
+    .form-error.show{display:block}
+    .btn-primary{height:50px;border-radius:14px;border:none;background:var(--primary);color:#fff;font-family:'Fustat',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:8px}
+    .btn-primary:active{transform:scale(.97);opacity:.9}
+    .btn-secondary{height:44px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text-s);font-family:'Fustat',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+    .btn-secondary:active{transform:scale(.97)}
+
+    /* المفضلة */
+    .fav-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:flex-start;gap:12px}
+    .fav-card .fav-icon{color:var(--danger);font-size:20px;flex-shrink:0;margin-top:2px}
+    .fav-card .fav-info{flex:1}
+    .fav-card .fav-info .fav-cat{font-size:11px;color:var(--primary);font-family:'Fustat',sans-serif;font-weight:600;margin-bottom:4px}
+    .fav-card .fav-info h4{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px}
+    .fav-card .fav-info p{font-size:14px;color:var(--text-s);line-height:1.8;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .fav-card .fav-remove{width:32px;height:32px;border-radius:8px;border:none;background:transparent;color:var(--text-m);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+    .fav-card .fav-remove:hover{color:var(--danger)}
+
+    /* الإعدادات */
+    .settings-group{margin-bottom:24px}
+    .settings-group-title{font-size:13px;font-weight:600;color:var(--text-m);font-family:'Fustat',sans-serif;margin-bottom:10px;padding-right:4px}
+    .settings-list{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    .setting-item{display:flex;align-items:center;justify-content:space-between;padding:16px;cursor:pointer;transition:background .2s;border:none;background:none;width:100%;text-align:right;font-family:'Noto Naskh Arabic',serif}
+    .setting-item+.setting-item{border-top:1px solid var(--border)}
+    .setting-item:active{background:var(--card-hover)}
+    .setting-item-right{display:flex;align-items:center;gap:12px}
+    .setting-item-right .material-symbols-rounded{font-size:22px;color:var(--primary)}
+    .setting-item-right span{font-size:15px;color:var(--text)}
+    .setting-item-left{display:flex;align-items:center;gap:4px;color:var(--text-m);font-size:13px}
+    .setting-item-left .material-symbols-rounded{font-size:20px}
+    .toggle{width:48px;height:28px;border-radius:14px;background:var(--surface);position:relative;cursor:pointer;transition:background .3s;border:none;padding:0;flex-shrink:0}
+    .toggle.on{background:var(--primary)}
+    .toggle::after{content:'';position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.15);transition:transform .3s}
+    .toggle.on::after{transform:translateX(-20px)}
+    .version-info{text-align:center;padding:20px;color:var(--text-m);font-size:12px;font-family:'Fustat',sans-serif;line-height:1.8}
+
+    /* إشعار + تحديث */
+    .toast{position:absolute;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 20px;border-radius:10px;font-size:13px;font-family:'Fustat',sans-serif;font-weight:500;opacity:0;pointer-events:none;transition:all .3s;z-index:100;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .update-bar{position:absolute;top:0;left:0;right:0;height:3px;background:var(--surface);z-index:20;opacity:0;transition:opacity .3s}
+    .update-bar.show{opacity:1}
+    .update-bar .fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));width:0%;transition:width .3s ease;border-radius:0 2px 2px 0}
+
+    /* شاشة البداية */
+    .splash-screen{position:absolute;inset:0;background:var(--primary);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;transition:opacity .6s,transform .6s}
+    .splash-screen.hide{opacity:0;transform:scale(1.05);pointer-events:none}
+    .splash-screen h1{font-size:44px;font-weight:700;color:#fff;letter-spacing:2px}
+    .splash-screen p{font-size:14px;color:rgba(255,255,255,0.7);margin-top:6px}
+    .splash-loader{margin-top:36px;width:36px;height:36px;border:3px solid rgba(255,255,255,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* فاصل زخرفي */
+    .ornament{display:flex;align-items:center;justify-content:center;gap:10px;margin:4px 0 12px;color:var(--surface);font-size:14px}
+    .ornament::before,.ornament::after{content:'';width:40px;height:1px;background:var(--surface)}
+    [data-theme="dark"] .ornament,.ornament::before,.ornament::after{color:var(--border)}
+
+    @media(max-width:430px){
+      body{padding:0}
+      .page-bg{padding:0}
+      .page-label{display:none}
+      .phone-frame{width:100vw;height:100vh;height:100dvh;border-radius:0;box-shadow:none}
+      .status-bar .notch{display:none}
+    }
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+<div class="page-bg">
+  <span class="page-label">NAQSHBAND — DESIGN PROTOTYPE</span>
+  <div class="phone-frame" id="phoneFrame">
+    <div class="update-bar" id="updateBar"><div class="fill" id="updateFill"></div></div>
+    <div class="splash-screen" id="splashScreen">
+      <h1>نقشبند</h1>
+      <p>أوراد النقشبندية الجودية</p>
+      <div class="splash-loader"></div>
+    </div>
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="notch"></div>
+      <div class="status-icons">
+        <span class="material-symbols-rounded">signal_cellular_alt</span>
+        <span class="material-symbols-rounded">wifi</span>
+        <span class="material-symbols-rounded">battery_full</span>
+      </div>
+    </div>
+    <div class="app-container">
+
+      <!-- الرئيسية -->
+      <div class="screen active" id="screen-home">
+        <div class="app-brand">
+          <h1>نقشبند</h1>
+          <p>أوراد النقشبندية الجودية</p>
+        </div>
+        <div class="date-row" id="dateRow"></div>
+        <div class="section-title">الأوراد</div>
+        <div class="wird-cards" id="wirdCards"></div>
+      </div>
+
+      <!-- شاشة الورد -->
+      <div class="screen" id="screen-wird">
+        <div class="sub-header">
+          <button class="back-btn" onclick="goBack()"><span class="material-symbols-rounded">arrow_forward</span></button>
+          <h2 id="wirdTitle"></h2>
+        </div>
+        <div class="wird-header-progress">
+          <div class="wird-header-bar"><div class="fill" id="wirdPBar" style="width:0%"></div></div>
+        </div>
+        <div class="bismillah-header">بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ</div>
+        <div class="adhkar-list" id="adhkarList"></div>
+      </div>
+
+      <!-- البحث -->
+      <div class="screen" id="screen-search">
+        <div style="padding-top:4px;margin-bottom:16px">
+          <h2 style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px">البحث</h2>
+          <p style="font-size:13px;color:var(--text-s)">ابحث في جميع الأوراد</p>
+        </div>
+        <div class="search-input-wrap">
+          <span class="material-symbols-rounded">search</span>
+          <input type="text" class="search-input" id="searchInput" placeholder="اكتب نص الذكر..." oninput="doSearch()">
+        </div>
+        <div id="searchResults"><div class="empty-state"><span class="material-symbols-rounded">search</span><p>ابحث عن أي ذكر في الأوراد<br>اكتب كلمة أو جزء من النص</p></div></div>
+      </div>
+
+      <!-- إدارة مخفية -->
+      <div class="screen" id="screen-mywird" style="position:relative">
+        <div class="sub-header">
+          <button class="back-btn" onclick="goBack()"><span class="material-symbols-rounded">arrow_forward</span></button>
+          <h2>إدارة الأذكار</h2>
+        </div>
+        <div style="margin-bottom:16px">
+          <p style="font-size:13px;color:var(--text-s)">قسم خاص لإضافة أذكار تظهر داخل الاعتصام أو الخلاصة</p>
+        </div>
+        <div class="my-wird-list" id="myWirdList"></div>
+        <button class="fab" onclick="navTo('add-wird',true)"><span class="material-symbols-rounded">add</span></button>
+      </div>
+
+      <!-- إضافة ورد -->
+      <div class="screen" id="screen-add-wird">
+        <div class="sub-header">
+          <button class="back-btn" onclick="goBack()"><span class="material-symbols-rounded">arrow_forward</span></button>
+          <h2>إضافة ذكر جديد</h2>
+        </div>
+        <form class="add-wird-form" id="addForm" onsubmit="return addWird(event)">
+          <div class="form-group">
+            <label>القسم</label>
+            <select class="form-input" id="nwWird">
+              <option value="kholasa">الخلاصة المرضية</option>
+              <option value="i3tesam">الاعتصام النقشبندي</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>نص الذكر</label>
+            <textarea class="form-textarea" id="nwText" placeholder="اكتب نص الذكر هنا..."></textarea>
+            <span class="form-error" id="errText">يرجى كتابة نص الذكر</span>
+          </div>
+          <div class="form-group">
+            <label>عدد مرات التكرار</label>
+            <input type="number" class="form-input" id="nwCount" placeholder="1" min="1" value="1">
+          </div>
+          <button type="submit" class="btn-primary">حفظ الذكر</button>
+          <button type="button" class="btn-secondary" onclick="goBack()">إلغاء</button>
+        </form>
+      </div>
+
+      <!-- المفضلة -->
+      <div class="screen" id="screen-favorites">
+        <div style="padding-top:4px;margin-bottom:16px">
+          <h2 style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px">المفضلة</h2>
+          <p style="font-size:13px;color:var(--text-s)">الأجزاء التي أضفتها أثناء القراءة</p>
+        </div>
+        <div id="favList"></div>
+      </div>
+
+      <!-- الإعدادات -->
+      <div class="screen" id="screen-settings">
+        <div style="padding-top:4px;margin-bottom:20px">
+          <h2 style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px">الإعدادات</h2>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">المظهر</div>
+          <div class="settings-list">
+            <button class="setting-item" onclick="toggleDark()">
+              <div class="setting-item-right"><span class="material-symbols-rounded">dark_mode</span><span>الوضع الليلي</span></div>
+              <div class="toggle" id="darkToggle"></div>
+            </button>
+          </div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">البيانات</div>
+          <div class="settings-list">
+            <button class="setting-item" onclick="simUpdate()">
+              <div class="setting-item-right"><span class="material-symbols-rounded">sync</span><span>التحقق من التحديثات</span></div>
+              <div class="setting-item-left"><span class="material-symbols-rounded">chevron_back</span></div>
+            </button>
+            <button class="setting-item" onclick="resetProg()">
+              <div class="setting-item-right"><span class="material-symbols-rounded">restart_alt</span><span>إعادة تعيين التقدم</span></div>
+              <div class="setting-item-left"><span class="material-symbols-rounded">chevron_back</span></div>
+            </button>
+          </div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">حول التطبيق</div>
+          <div class="settings-list">
+            <div class="setting-item" style="cursor:default">
+              <div class="setting-item-right"><span class="material-symbols-rounded">info</span><span>الإصدار</span></div>
+              <div class="setting-item-left" style="color:var(--text-m)">1.0.0</div>
+            </div>
+          </div>
+        </div>
+        <div class="version-info">نقشبند — أوراد النقشبندية الجودية<br>صُنع بحب لكل طالب طريق</div>
+      </div>
+
+    </div>
+    <nav class="bottom-nav" id="bottomNav">
+      <button class="nav-item active" data-s="home" onclick="tab('home')"><span class="material-symbols-rounded">home</span><span>الرئيسية</span></button>
+      <button class="nav-item" data-s="search" onclick="tab('search')"><span class="material-symbols-rounded">search</span><span>البحث</span></button>
+      <button class="nav-item" data-s="favorites" onclick="tab('favorites')"><span class="material-symbols-rounded">favorite</span><span>المفضلة</span></button>
+      <button class="nav-item" data-s="settings" onclick="tab('settings')"><span class="material-symbols-rounded">settings</span><span>الإعدادات</span></button>
+    </nav>
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   بيانات الأوراد — الخلاصة المرضية (النصوص المرسلة)
+   الاعتصام النقشبندي: placeholder حتى إرسال النصوص
+================================================================ */
+const appData = {
+  wirds: [
+    {
+      id:'kholasa', name:'الخلاصة المرضية',
+      adhkar:[
+        {id:'k1',text:'اللَّهُمَّ أَنْتَ رَبِّي، لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي، وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي، فَاغْفِرْ لِي؛ فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ. سُبْحَانَ اللهِ، وَالحَمْدُ للهِ، وَلَا إِلَهَ إِلَّا اللهُ، وَاللهُ أَكْبَرُ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ العَلِيِّ العَظِيمِ.',count:1},
+        {id:'k2',text:'﴿هُوَ الْأَوَّلُ وَالْآخِرُ وَالظَّاهِرُ وَالْبَاطِنُ وَهُوَ بِكُلِّ شَيْءٍ عَلِيمٌ﴾ ﴿يُحْيِي وَيُمِيتُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ﴾ ﴿قُلِ اللَّهُمَّ مَالِكَ الْمُلْكِ تُؤْتِي الْمُلْكَ مَن تَشَاءُ وَتَنزِعُ الْمُلْكَ مِمَّن تَشَاءُ وَتُعِزُّ مَن تَشَاءُ وَتُذِلُّ مَن تَشَاءُ بِيَدِكَ الْخَيْرُ إِنَّكَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ * تُولِجُ اللَّيْلَ فِي النَّهَارِ وَتُولِجُ النَّهَارِ فِي اللَّيْلِ وَتُخْرِجُ الْحَيَّ مِنَ الْمَيَّتِ وَتُخْرِجُ الْمَيَّتَ مِنَ الْحَيِّ وَتَرْزُقُ مَن تَشَاءُ بِغَيْرِ حِسَابٍ﴾.',count:1},
+        {id:'k3',text:'سُبْحَانَكَ يَا مَنِ احْتَجَبَ فِي الأُولَى عَنْ جَمِيعِ الوَرَى، سُبْحَانَكَ يَا مَنْ تَفَرَّدَ بِالجَلَالِ وَالكِبْرِيَاءِ، سُبْحَانَكَ يَا مَالِكَ جَمِيعِ الأَشْيَاءِ، سُبْحَانَكَ يَا مَنْ تَعَزَّزَ بِالقُدْرَةِ وَالعُلَا، ﴿طس﴾ ﴿طسم﴾ ﴿مَرَجَ الْبَحْرَيْنِ يَلْتَقِيَانِ * بَيْنَهُمَا بَرْزَخٌ لَّا يَبْغِيَانِ﴾ ﴿اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ﴾ حم حم حم، حم حم حم، حم. حُمَّ الأَمْرُ وَجَاءَ النَّصْرُ فَعَلَيْنَا لَا يُنْصَرُونَ ﴿حم * تَنزِيلُ الْكِتَابِ مِنَ اللَّهِ الْعَزِيزِ الْعَلِيمِ * غَافِرِ الذَّنبِ وَقَابِلِ التَّوْبِ شَدِيدِ الْعِقَابِ ذِي الطَّوْلِ لَا إِلَهَ إِلَّا هُوَ إِلَيْهِ الْمَصِيرُ﴾ مَا شَاءَ اللهُ كَانَ وَمَا لَمْ يَشَأْ لَمْ يَكُنْ، ﴿أَعْلَمُ أَنَّ اللَّهَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ * وَأَنَّ اللَّهَ قَدْ أَحَاطَ بِكُلِّ شَيْءٍ عِلْمًا﴾. حَسْبُنَا اللهُ لِدِينِنَا، حَسْبُنَا اللهُ لِدُنْيَانَا، حَسْبُنَا اللهُ لِمَا أَهَمَّنَا، حَسْبُنَا اللهُ الحَكِيمُ القَوِيُّ لِمَنْ بَغَى عَلَيْنَا، حَسْبُنَا اللهُ الرَّحِيمُ عِنْدَ المَوْتِ، حَسْبُنَا اللهُ الرَّؤُوفُ عِنْدَ المَسَأَلَةِ فِي القَبْرِ.',count:1},
+        {id:'k4',text:'﴿حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ﴾',count:7},
+        {id:'k5',text:'أَصْبَحْتُ (في المساء: أَمْسَيْتُ) بِاللهِ مُؤْمِنًا، وَبِلِقَائِهِ مُصَدِّقًا، وَبِحُجَّتِهِ مُعْتَرِفًا، وَبِسِوَى اللهِ فِي الأُلُوهِيَّةِ جَاحِدًا، وَعَلَى اللهِ مُتَوَكِّلًا. لَبَّيْكَ اللَّهُمَّ وَسَعْدَيْكَ، وَالخَيْرُ كُلُّهُ بِيَدَيْكَ، نَسْتَغْفِرُكَ وَنَتُوبُ إِلَيْكَ. آمَنَّا وَصَدَّقْنَا اللَّهُمَّ بِمَا أَرْسَلْتَ مِنْ رَسُولٍ، وَآمَنَّا وَصَدَّقْنَا بِمَا أَنْزَلْتَ مِنْ كِتَابٍ. اللَّهُمَّ اجْعَلْ أَوَّلَ يَوْمِنَا [لَيْلِنَا] هَذَا صَلَاحًا، وَأَوْسَطَهُ فَلَاحًا، وَآخِرَهُ نَجَاحًا. اللَّهُمَّ إِنَّا نَعُوذُ بِكَ مِنْ عِلْمٍ لَا يَنْفَعُ، وَمِنْ قَلْبٍ لَا يَخْشَعُ، وَمِنْ نَفْسٍ لَا تَشْبَعُ، وَمِنْ دُعَاءٍ لَا يُسْمَعُ. اللَّهُمَّ فَهِّمْنَا أَسْرَارَكَ، وَأَلْبِسْنَا مَلَابِسَ أَنْوَارِكَ، وَاغْمِسْنَا فِي بَحْرِ اللَّطَائِفِ، وَأَفِضْ عَلَيْنَا مِنْ عَوَارِفِ الْمَعَارِفِ. يَا نُورَ الْأَنْوَارِ، يَا لَطِيفُ يَا سَتَّارُ، نَسْأَلُكَ أَنْ تُصَلِّيَ عَلَى سَيِّدِنَا مُحَمَّدٍ نِبْرَاسِ الْأَنْبِيَاءِ، وَسِرَاجِ الْأَوْلِيَاءِ، وَقَمَرِ الْأَصْفِيَاءِ، وَشَمْسِ الثَّقَلَيْنِ، وَضِيَاءِ الْخَافِقَيْنِ، وَأَنْ تَرْفَعَ وُجُودَنَا إِلَى فَلَكِ الْعِرْفَانِ، وَتُثَبِّتَ شُهُودَنَا فِي مَقَامِ الْإِحْسَانِ.',count:1},
+        {id:'k6',text:'يَا اللهُ يَا نُورُ، يَا عَظِيمُ يَا شَكُورُ، نَسْأَلُكَ بِاسْمِكَ الَّذِي تَرَقْرَقَتْ بِهِ الْخُنَّسُ وَالْأَزْهَرَانِ حِرْزًا مَانِعًا، وَنُورًا سَاطِعًا ﴿يَكَادُ سَنَا بَرْقِهِ يَذْهَبُ بِالْأَبْصَارِ * يُقَلِّبُ اللَّهُ اللَّيْلَ وَالنَّهَارَ إِنَّ فِي ذَلِكَ لَعِبْرَةً لِّأُولِي الْأَبْصَارِ﴾ ﴿طس﴾ ﴿طسم﴾ ﴿سَلَامٌ قَوْلًا مِّن رَّبٍّ رَّحِيمٍ﴾ ﴿فَسَيَكْفِيكَهُمُ اللَّهُ وَهُوَ السَّمِيعُ الْعَلِيمُ﴾.',count:1},
+        {id:'k7',text:'﴿هُوَ اللَّهُ الَّذِي لَا إِلَهَ إِلَّا هُوَ عَالِمُ الْغَيْبِ وَالشَّهَادَةِ هُوَ الرَّحْمَنُ الرَّحِيمُ * هُوَ اللَّهُ الَّذِي لَا إِلَهَ إِلَّا هُوَ الْمَلِكُ الْقُدُّوسُ السَّلَامُ الْمُؤْمِنُ الْمُهَيْمِنُ الْعَزِيزُ الْجَبَّارُ الْمُتَكَبِّرُ سُبْحَانَ اللَّهُ عَمَّا يُشْرِكُونَ * هُوَ اللَّهُ الْخَالِقُ الْبَارِئُ الْمُصَوِّرُ لَهُ الْأَسْمَاءُ الْحُسْنَى يُسَبِّحُ لَهُ مَا فِي السَّمَاوَاتِ وَالْأَرْضِ وَهُوَ الْعَزِيزُ الْحَكِيمُ﴾.',count:1},
+        {id:'k8',text:'﴿حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ﴾ ﴿نِعْمَ الْمَوْلَى وَنِعْمَ النَّصِيرُ﴾ ﴿غُفْرَانَكَ رَبَّنَا وَإِلَيْكَ الْمَصِيرُ﴾، يَا دَائِمًا بِلَا فَنَاءٍ، وَيَا بَاقِيًا بِلَا زَوَالٍ، وَيَا مُدَبِّرًا بِلَا وَزِيرٍ، سَهِّلْ عَلَيْنَا كُلَّ عَسِيرٍ.',count:1},
+        {id:'k9',text:'بِسْمِ اللهِ الشَّافِي هُوَ اللهُ، بِسْمِ اللهِ الْكَافِي هُوَ اللهُ، بِسْمِ اللهِ الْمُعَافِي هُوَ اللهُ.',count:1},
+        {id:'k10',text:'بِسْمِ اللهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ',count:3},
+        {id:'k11',text:'﴿فَاللَّهُ خَيْرٌ حَافِظًا وَهُوَ أَرْحَمُ الرَّاحِمِينَ﴾ ﴿وَاللَّهُ مِن وَرَائِهِم مُّحِيطٌ * بَلْ هُوَ قُرْآنٌ مَّجِيدٌ * فِي لَوْحٍ مَّحْفُوظٍ﴾ ﴿حَافِظُوا عَلَى الصَّلَوَاتِ وَالصَّلَاةِ الْوُسْطَى وَقُومُوا لِلَّهِ قَانِتِينَ﴾ ﴿إِن كُلُّ نَفْسٍ لَّمَا عَلَيْهَا حَافِظٌ﴾ نِعْمَ الْحَافِظُ اللهُ، يَا حَفِيظُ احْفَظْنَا ﴿مُحَمَّدٌ رَّسُولُ اللَّهِ وَالَّذِينَ مَعَهُ أَشِدَّاءُ عَلَى الْكُفَّارِ رُحَمَاءُ بَيْنَهُمْ تَرَاهُمْ رُكَّعًا سُجَّدًا يَبْتَغُونَ فَضْلًا مِّنَ اللَّهِ وَرِضْوَانًا سِيمَاهُمْ فِي وُجُوهِهِم مِّنْ أَثَرِ السُّجُودِ ذَلِكَ مَثَلُهُمْ فِي التَّوْرَاةِ وَمَثَلُهُمْ فِي الْإِنجِيلِ كَزَرْعٍ أَخْرَجَ شَطْأَهُ فَآزَرَهُ فَاسْتَغْلَظَ فَاسْتَوَى عَلَى سُوقِهِ يُعْجِبُ الزُّرَّاعَ لِيَغِيظَ بِهِمُ الْكُفَّارَ وَعَدَ اللَّهُ الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ مِنْهُم مَّغْفِرَةً وَأَجْرًا عَظِيمًا﴾ ﴿شَهِدَ اللَّهُ أَنَّهُ لَا إِلَهَ إِلَّا هُوَ وَالْمَلَائِكَةُ وَأُولُو الْعِلْمِ قَائِمًا بِالْقِسْطِ لَا إِلَهَ إِلَّا هُوَ الْعَزِيزُ الْحَكِيمُ * إِنَّ الدِّينَ عِندَ اللَّهِ الْإِسْلَامُ﴾ ﴿فَسُبْحَانَ اللَّهِ حِينَ تُمْسُونَ وَحِينَ تُصْبِحُونَ * وَلَهُ الْحَمْدُ فِي السَّمَاوَاتِ وَالْأَرْضِ وَعَشِيًّا وَحِينَ تُظْهِرُونَ * يُخْرِجُ الْحَيَّ مِنَ الْمَيَّتِ وَيُخْرِجُ الْمَيَّتَ مِنَ الْحَيِّ وَيُحْيِي الْأَرْضَ بَعْدَ مَوْتِهَا وَكَذَلِكَ تُخْرَجُونَ﴾ ﴿إِنِّي تَوَكَّلْتُ عَلَى اللَّهِ رَبِّي وَرَبِّكُم مَّا مِن دَابَّةٍ إِلَّا هُوَ آخِذٌ بِنَاصِيَتِهَا إِنَّ رَبِّي عَلَى صِرَاطٍ مُّسْتَقِيمٍ﴾ ﴿وَمَا لَنَا أَلَّا نَتَوَكَّلَ عَلَى اللَّهِ وَقَدْ هَدَانَا سُبُلَنَا وَلَنَصْبِرَنَّ عَلَى مَا آذَيْتُمُونَا وَعَلَى اللَّهِ فَلْيَتَوَكَّلِ الْمُتَوَكِّلُونَ﴾ ﴿قُل لَّن يُصِيبَنَا إِلَّا مَا كَتَبَ اللَّهُ لَنَا هُوَ مَوْلَانَا وَعَلَى اللَّهِ فَلْيَتَوَكَّلِ الْمُؤْمِنُونَ﴾ ﴿وَمَا مِن دَابَّةٍ فِي الْأَرْضِ إِلَّا عَلَى اللَّهِ رِزْقُهَا وَيَعْلَمُ مُسْتَقَرَّهَا وَمُسْتَوْدَعَهَا كُلٌّ فِي كِتَابٍ مُّبِينٍ﴾ ﴿وَكَأَيِّن مِّن دَابَّةٍ لَّا تَحْمِلُ رِزْقَهَا اللَّهُ يَرْزُقُهَا وَإِيَّاكُمْ وَهُوَ السَّمِيعُ الْعَلِيمُ﴾ ﴿مَّا يَفْتَحِ اللَّهُ لِلنَّاسِ مِن رَّحْمَةٍ فَلَا مُمْسِكَ لَهَا وَمَا يُمْسِكْ فَلَا مُرْسِلَ لَهُ مِن بَعْدِهِ وَهُوَ الْعَزِيزُ الْحَكِيمُ﴾ ﴿وَلَئِن سَأَلْتَهُم مَّنْ خَلَقَ السَّمَاوَاتِ وَالْأَرْضَ لَيَقُولُنَّ اللَّهُ قُلْ أَفَرَأَيْتُم مَّا تَدْعُونَ مِن دُونِ اللَّهِ إِنْ أَرَادَنِيَ اللَّهُ بِضُرٍّ هَلْ هُنَّ كَاشِفَاتُ ضُرِّهِ أَوْ أَرَادَنِي بِرَحْمَةٍ هَلْ هُنَّ مُمْسِكَاتُ رَحْمَتِهِ قُلْ حَسْبِيَ اللَّهُ عَلَيْهِ يَتَوَكَّلُ الْمُتَوَكِّلُونَ﴾ ﴿وَمَا جَعَلَهُ اللَّهُ إِلَّا بُشْرَى لَكُمْ وَلِتَطْمَئِنَّ قُلُوبُكُم بِهِ وَمَا النَّصْرُ إِلَّا مِنْ عِندِ اللَّهِ الْعَزِيزِ الْحَكِيمُ﴾ ﴿كهيعص﴾ ﴿حم عسق﴾ اكْفِنَا وَارْحَمْنَا، هُوَ اللهُ الْقَادِرُ الْقَاهِرُ الظَّاهِرُ الْبَاطِنُ اللَّطِيفُ الْخَبِيرُ.',count:1},
+        {id:'k12',text:'﴿قَوْلُهُ الْحَقُّ وَلَهُ الْمُلْكُ يَوْمَ يُنفَخُ فِي الصُّورِ عَالِمُ الْغَيْبِ وَالشَّهَادَةِ وَهُوَ الْحَكِيمُ الْخَبِيرُ﴾ تَحَصَّنْتُ بِالْقَوِيِّ الْمَتِينِ اللَّطِيفِ الْكَافِي الْحَفِيظِ الْحَيِّ الْقَيُّومِ، الَّذِي لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ.',count:1},
+        {id:'k13',text:'يَا حَنَّانُ يَا مَنَّانُ، يَا بَدِيعَ السَّمَاوَاتِ وَالْأَرْضِ، يَا حَيُّ يَا قَيُّومُ، يَا ذَا الْجَلَالِ وَالْإِكْرَامِ، نَسْأَلُكَ بِعِظَمِ الْأُلُوهِيَّةِ أَنْ تَنْقُلَ طِبَاعَنَا مِنْ طِبَاعِ الْبَشَرِيَّةِ، وَأَنْ تَرْفَعَ مُهَجَنَا مَعَ مَلَائِكَتِكَ الْعُلْوِيَّةِ.',count:1},
+        {id:'k14',text:'يَا مُحَوِّلَ الْحَوْلِ وَالْأَحْوَالِ حَوِّلْ حَالَنَا إِلَى أَحْسَنِ حَالٍ',count:3},
+        {id:'k15',text:'اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ السَّابِقِ إِلَى الْأَنَامِ نُورُهُ، الرَّحْمَةِ لِلْعَالَمِينَ ظُهُورُهُ، عَدَدَ مَنْ مَضَى مِنَ الْبَرِيَّةِ وَمَنْ بَقِيَ، وَمَنْ سَعِدَ مِنْهُمْ وَمَنْ شَقِيَ، صَلَاةً تَسْتَغْرِقُ الْعَدَّ، وَتُحِيطُ بِالْحَدِّ، لَا غَايَةَ لَهَا وَلَا انْتِهَاءَ وَلَا أَمَدَ، صَلَاتَكَ الَّتِي صَلَّيْتَ عَلَيْهِ، صَلَاةً دَائِمَةً، وَعَلَى آلِهِ وَصَحْبِهِ وَسَلِّمْ تَسْلِيمًا مِثْلَ ذَلِكَ، وَالْحَمْدُ للهِ رَبِّ الْعَالَمِينَ.',count:1},
+        {id:'k16',text:'﴿سُبْحَانَ رَبِّكَ رَبِّ الْعِزَّةِ عَمَّا يَصِفُونَ * وَسَلَامٌ عَلَى الْمُرْسَلِينَ * وَالْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ﴾.',count:1}
+      ]
+    },
+    {
+      id:'i3tesam', name:'الاعتصام النقشبندي',
+      adhkar:[
+        {
+                "id": "i1",
+                "text": "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+                "count": 1
+        },
+        {
+                "id": "i2",
+                "text": "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ",
+                "count": 1
+        },
+        {
+                "id": "i3",
+                "text": "﴿وَاتَّبَعُوا مَا تَتْلُو الشَّيَاطِينُ عَلَى مُلْكِ سُلَيْمَانَ وَمَا كَفَرَ سُلَيْمَانُ وَلَكِنَّ الشَّيَاطِينَ كَفَرُوا يُعَلِّمُونَ النَّاسَ السِّحْرَ وَمَا أُنْزِلَ عَلَى الْمَلَكَيْنِ بِبَابِلَ هَارُوتَ وَمَارُوتَ وَمَا يُعَلِّمَانِ مِنْ أَحَدٍ حَتَّى يَقُولَا إِنَّمَا نَحْنُ فِتْنَةٌ فَلَا تَكْفُرْ فَيَتَعَلَّمُونَ مِنْهُمَا مَا يُفَرِّقُونَ بِهِ بَيْنَ الْمَرْءِ وَزَوْجِهِ وَمَا هُمْ بِضَارِّينَ بِهِ مِنْ أَحَدٍ إِلَّا بِإِذْنِ اللَّهِ وَيَتَعَلَّمُونَ مَا يَضُرُّهُمْ وَلَا يَنْفَعُهُمْ وَلَقَدْ عَلِمُوا لَمَنِ اشْتَرَاهُ مَا لَهُ فِي الْآخِرَةِ مِنْ خَلَاقٍ وَلَبِئْسَ مَا شَرَوْا بِهِ أَنْفُسَهُمْ لَوْ كَانُوا يَعْلَمُونَ * وَلَوْ أَنَّهُمْ آمَنُوا وَاتَّقَوْا لَمَثُوبَةٌ مِنْ عِنْدِ اللَّهِ خَيْرٌ لَوْ كَانُوا يَعْلَمُونَ * وَلَوْ أَنَّهُمْ آمَنُوا وَاتَّقُوا لَمَثُوبَةٌ مِنْ عِنْدِ اللَّهِ خَيْرٌ لَوْ كَانُوا يَعْلَمُونَ﴾.",
+                "count": 1
+        },
+        {
+                "id": "i4",
+                "text": "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ",
+                "count": 1
+        },
+        {
+                "id": "i5",
+                "text": "يا حَبِيبَ الفُقَراءِ، وَيا أَنِيسَ الغُرَباءِ، وَيا مُعِينَ الضُّعَفاءِ، وَيا عَظِيمَ الرَّجاءِ، وَيا دَلِيلَ المُتَحَيِّرِينَ، وَيا غِياثَ المُسْتَغِيثِينَ، يا حَيُّ يا قَيُّومُ، يا حَنَّانُ يا مَنَّانُ، يا اللهُ، يا مُفَتِّحَ الأَبْوابِ، يا مُسَبِّبَ الأَسْبابِ، يا مُقَلِّبَ القُلُوبِ والأَبْصارِ، يا ذا الجَلالِ والإِكْرامِ، فاعْفُ عَنِّي واغْفِرْ لي وارْحَمْنِي بِرَحْمَتِكَ يا أَرْحَمَ الرَّاحِمِينَ.",
+                "count": 1
+        },
+        {
+                "id": "i6",
+                "text": "إلهي كَيْفَ أَدْعُوكَ وأَنا أَنا؟ وكَيْفَ أَقْطَعُ رَجائِي عَنْكَ وأَنْتَ أَنْتَ؟ إلهي إِنْ لَمْ أَدْعُكَ فَتَسْتَجِيبَ لي، فَمَنِ ذا الَّذِي أَدْعُوهُ فَيَسْتَجِيبَ لي؟ إلهي إِنْ لَمْ أَسْأَلْكَ فَتُعْطِيَنِي، فَمَنِ ذا الَّذِي أَسْأَلُهُ فَيُعْطِيَنِي؟ إلهي إِنْ لَمْ أَتَضَرَّعْ إِلَيْكَ فَتَرْحَمَنِي، فَمَنِ ذا الَّذِي أَتَضَرَّعُ إِلَيْهِ فَيَرْحَمَنِي؟ إلهي كَما فَلَقْتَ البَحْرَ لِسَيِّدِنا مُوسَى عليهِ السَّلامُ، وَجَعَلْتَ النَّارَ بَرْدًا وَسَلَامًا على سَيِّدِنا إِبْراهِيمَ عليهِ السَّلامُ، فَنَجَّيْتَهُما مِنْ ذَلِكَ، أَسْأَلُكَ أَنْ تُنَجِّيَنِي مِمَّا أَنا فِيهِ، وأَنْ تَجْعَلَ لي فَرَجًا ومَخْرَجًا مِمَّا أَنا فِيهِ. لا إِلَهَ إِلا اللهُ، سَيِّدُنا مُحَمَّدٌ رَسُولُ اللهِ حَقًّا، وَصَلَّى اللهُ عَلَى كُلِّ نَبِيٍّ وَمَلَكٍ. أَسْتَغْفِرُ اللهَ مِنْ جَمِيعِ ما كَرِهَ اللهُ قَوْلًا وفِعْلًا وخاطِرًا وناظِرًا، وأَتُوبُ إِلَيْهِ، وَأَسْأَلُهُ التَّوْبَةَ وَالمَغْفِرَةَ وَالهِدايَةَ إِنَّهُ هُوَ التَّوَّابُ الرَّحِيمُ، واعْفُ عَنَّا يا كَرِيمُ، واغْفِرْ لَنا يا رَحْمَنُ يا رَحِيمُ، يا مَلِكُ يا قُدُّوسُ يا ذا الجَلالِ والإِكْرامِ، بِرَحْمَتِكَ يا أَرْحَمَ الرَّاحِمِينَ.",
+                "count": 1
+        },
+        {
+                "id": "i7",
+                "text": "اللَّهُمَّ بِالحَقِّ أَنْزَلْتَهُ وَبِالحَقِّ نَزَلَ، اللَّهُمَّ عَظِّمْ فِيهِ رَغْبَتِي، واجْعَلْهُ نُورًا لِبَصَرِي، وشِفاءً لِصَدْرِي، اللَّهُمَّ زَيِّنْ بِهِ لِسانِي، وَجَمِّلْ بِهِ وَجْهِي، وَقَوِّ بِهِ جَسَدِي، وارْزُقْنِي تِلاوَتَهُ عَلَى طاعَتِكَ آناءَ اللَّيْلِ وأَطْرافَ النَّهارِ، واحْشُرْنِي مَعَ النَّبِيِّ وآلِهِ الأَخْيارِ، بِرَحْمَتِكَ (يا أَرْحَمَ الرَّاحِمِينَ).",
+                "count": 3
+        },
+        {
+                "id": "i8",
+                "text": "(لا إِلَهَ إِلا اللهُ).",
+                "count": 100
+        },
+        {
+                "id": "i9",
+                "text": "اللَّهُمَّ صَلِّ على سَيِّدِنا مُحَمَّدٍ بِعَدَدِ أَنْفاسِ المَخْلُوقاتِ، اللَّهُمَّ صَلِّ على سَيِّدِنا مُحَمَّدٍ بِعَدَدِ أَشْعارِ المَوْجُوداتِ، اللَّهُمَّ صَلِّ على سَيِّدِنا مُحَمَّدٍ بِعَدَدِ حُرُوفِ اللَّوْحِ والدَّعَواتِ، اللَّهُمَّ صَلِّ على سَيِّدِنا مُحَمَّدٍ بِعَدَدِ سَواكِنِ السَّبْعِ أَرَاضِينَ والسَّماواتِ، اللَّهُمَّ صَلِّ على سَيِّدِنا مُحَمَّدٍ بِعَدَدِ ما خُلِقَ مِنَ البِدَاياتِ والنَّهاياتِ، وعَدَدِ المَعْدُوماتِ والمَوْجُوداتِ إلى أَبَدِ الآبادِ. اللَّهُمَّ صَلِّ على سَيِّدِنا مُحَمَّدٍ النَّبِيِّ المُخْتارِ بِعَدَدِ مَنْ صَلَّى عَلَيْهِ مِنَ الأَخْيارِ، وعَدَدِ مَنْ لَمْ يُصَلِّ عَلَيْهِ مِنَ الأَشْرارِ، وعَدَدِ قَطَراتِ الأَمْطارِ، وعَدَدِ أَمْواجِ البِحارِ، وعَدَدِ الرِّمالِ فِي القِفارِ، وعَدَدِ أَوْراقِ الأَشْجارِ، وعَدَدِ أَنْفاسِ المُسْتَغْفِرِينَ بِالأَسْحارِ، وعَدَدِ ما كانَ وَما يَكُونُ إِلى يَوْمِ الحَشْرِـ والقَرارِ، وَصَلِّ عَلَيْهِ ما تَعاقَبَ اللَّيْلُ والنَّهارُ، وَصَلِّ عَلَيْهِ ما اخْتَلَفَ المَلَوانِ، وَتَعاقَبَ العَصْرانِ، وَكَرَّ الجَدِيدانِ، واسْتَقْبَلَ الفَرْقَدانِ، وبَلِّغْ رُوحَهُ وأَرْواحَ أَهْلِ بَيْتِهِ مِنَّا التَّحِيَّةَ والسَّلامَ.",
+                "count": 1
+        },
+        {
+                "id": "i10",
+                "text": "اللَّهُمَّ صَلِّ على سَيِّدِنا مُحَمَّدٍ صَلاةً تُنْجِينا بِها مِنْ جَمِيعِ الأَهْوالِ والآفاتِ، وتَقْضِي لَنا بِها جَمِيعَ الحاجاتِ، وتُطَهِّرُنا بِها مِنْ جَمِيعِ السَّيِّئاتِ، وتَرْفَعُنا بِها أَعْلَى الدَّرَجاتِ، وتُبَلِّغُنا بِها أَقْصَىـ الغاياتِـ مِنْ جَمِيعِ الخَيْراتِ فِي الحَياةِ وَبَعْدَ المَماتِ، وعلى آلِهِ وصَحْبِهِ وسَلِّمْ تَسْلِيمًا كَثِيرًا. اللَّهُمَّ صَلِّ على سَيِّدِنا ونَبِيِّنا ورَسُولِنا وطَبِيبِ قُلُوبِنا وشَفِيعِ ذُنُوبِنا ومُرْشِدِنا وهادِينا مُحَمَّدٍ، عَبْدِكَ وحَبِيبِكَ ورَسُولِكَ النَّبِيِّ الأُمِّيِّ، وعلى آلِهِ الأَخْيارِ وصَحابَتِهِ الأَبْرارِ، وعلى جَمِيعِ الأَنْبِياءِ والمُرْسَلِينَ والمُؤْمِنِينَ والمُؤْمِناتِ، وسَلِّمْ تَسْلِيمًا بِعَدَدِ ما عَلِمَ اللهُ.",
+                "count": 1
+        },
+        {
+                "id": "i11",
+                "text": "اللَّهُمَّ إِني أَسْأَلُكَ أَنْ تُصَلِّيَ عَلَى سَيِّدِنا مُحَمَّدٍ نِبْراسِ الأَنْبِياءِ، وسِراجِ الأَوْلِياءِ، وقَمَرِ الأَصْفِياءِ، وشَمْسِ الثَّقَلَيْنِ، وضِياءِ الخافِقَيْنِ، وأَنْ تَرْفَعَ وُجُودَنا إِلى فَلَكِ العِرْفانِ، وتُثَبِّتَ شُهُودَنا فِي مَقامِ الإِحْسانِ. اللَّهُمَّ إِني أَسْأَلُكَ بِاسْمِكَ الأَعْظَمِ المَكْتُوبِ مِنْ نُورِ وَجْهِكَ الأَعْلَى المُؤَبَّدِ، الدَّائِمِ الباقِي المُخَلَّدِ، فِي قَلْبِ نَبِيِّكَ ورَسُولِكَ سَيِّدِنا مُحَمَّدٍ، وأَسْأَلُكَ بِاسْمِكَ الأَعْظَمِ الواحِدِ بِوَحْدَةِ الأَحَدِ، المُتَعالِي عَنْ وَحْدَةِ الكَمِّ والعَدَدِ، المُقَدَّسِ عَنْ كُلِّ أَحَدٍ، وبِحَقِّ ﴿قُلْ هُوَ اللَّهُ أَحَدٌ * اللَّهُ الصَّمَدُ * لَمْ يَلِدْ وَلَمْ يُولَدْ * وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ﴾، أَنْ تُصَلِّيَ عَلَى سَيِّدِنا مُحَمَّدٍ سِرِّ حَياةِ الوُجُودِ، والسَّبَبِ الأَعْظَمِ لِكُلِّ مَوْجُودٍ، صَلاةً تُثَبِّتُ بِها فِي قَلْبِي الإِيمانَ وتُحَفِّظُنِي القُرْآنَ، وتُفَهِّمُنِي مِنْهُ الآياتِ، وتَفْتَحُ لي بِها نُورَ الجَنَّاتِ، ونُورَ النَّعِيمِ، ونُورَ النَّظَرِ إِلى وَجْهِكَ الكَرِيمِ، وعلى آلِهِ وصَحْبِهِ وسَلِّمْ. اللَّهُمَّ صَلِّ عَلَى نُورِ الأَنْوارِ، وسِرِّ الأَسْرارِ، وتِرْياقِ الأَغْيارِ، ومِفْتاحِ بابِ اليَسارِ، سَيِّدِنا مُحَمَّدٍ النَّبِيِّ المُخْتارِ، وآلِهِ الأَطْهارِ، وأَصْحابِهِ الأَخْيارِ، عَدَدَ نِعَمِ اللهِ وإِفْضالِهِ اللَّهُمَّ صَلِّ وسَلِّمْ وبارِكْ على سَيِّدِنا ومَوْلانا مُحَمَّدٍ شَجَرَةِ الأَصْلِ النُّورانِيَّةِ، ولَمْعَةِ القَبْضَةِ الرَّحْمانِيَّةِ، وأَفْضَلِ الخَلِيقَةِ الإِنْسانِيَّةِ، وأَشْرَفِ الصُّورَةِ الجِسْمانِيَّةِ، ومَعْدِنِ الأَسْرارِ الرَّبَّانِيَّةِ، وخَزائِنِ العُلُومِ الاصْطِفائِيَّةِ، صاحِبِ القَبْضَةِ الأَصْلِيَّةِ والبَهْجَةِ السَّنِيَّةِ والرُّتْبَةِ العَلِيَّةِ، مَنِ انْدَرَجَتِ النَّبِيُّونَ تَحْتَ لِوائِهِ فَهُمْ مِنْهُ وَإِلَيْهِ، وَصَلِّ وسَلِّمْ وبارِكْ عَلَيْهِ وعلى آلِهِ وصَحْبِهِ، عَدَدَ ما خَلَقْتَ ورَزَقْتَ وأَمَتَّ وأَحْيَيْتَ، إِلى يَوْمِ تَبْعَثُ مَنْ أَفْنَيْتَ، وسَلِّمْ تَسْلِيمًا كَثِيرًا، والحَمْدُ للهِ رَبِّ العالَمِينَ. اللَّهُمَّ صَلِّ عَلَى الذَّاتِ المُحَمَّدِيَّةِ اللَّطِيفَةِ الأَحَدِيَّةِ، شَمْسِ سَماءِ الأَسْرارِ ومَظْهَرِ الأَنْوارِ، ومَرْكَزِ مَدارِ الجَلالِ وقُطْبِ فَلَكِ الجَمالِ، اللَّهُمَّ بِسِرِّهِ لَدَيْكَ وسَيْرِهِ إِلَيْكَ، آمِنْ خَوْفِي، وأَقِلْ عَثْرَتِي، وأَذْهِبْ حُزْنِي وحِرْصِي، وكُنْ لي، وخُذْنِي إِلَيْكَ مِنِّي، وارْزُقْنِي الفَناءَ عَنِّي، ولا تَجْعَلْنِي مَفْتُونًا بِنَفْسِي، مَحْجُوبًا بِحِسِّي، واكْشِفْ لي عَنْ كُلِّ سِرٍّ مَكْتُومٍ يا حَيُّ يا قَيُّومُ. ﴿سُبْحَانَ رَبِّكَ رَبِّ الْعِزَّةِ عَمَّا يَصِفُونَ * وَسَلَامٌ عَلَى الْمُرْسَلِينَ * وَالْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ﴾، وبه الحَوْلُ والقُوَّةُ.",
+                "count": 1
+        },
+        {
+                "id": "i12",
+                "text": "«رَبِّ سَهِّلْ ويَسِّرْ ولا تُعَسِّرْ علينا، يا مُيَسِّرَ كُلِّ عَسِيرٍ».",
+                "count": 3
+        },
+        {
+                "id": "i13",
+                "text": "ثم ترفع يديك، وتقرأ الفاتحة على مقصودك، وتمسح بهما وجهك، وتَشْرَعُ في قراءة الورد بجمع الهِمَّةِ، وإخلاصِ الطَّوِيَّةِ، مُسْتَعِينًا بالحقِّ جَلَّ وعلا.",
+                "count": 1
+        }
+]
+    }
+  ]
+};
+
+/* ========== الحالة ========== */
+const S = {
+  cur:'home', stack:['home'], dark:false,
+  selWird:null, favs:[], myWirds:[], myProg:{}, prog:{}, adminAdditions:[]
+};
+
+const mainTabs = ['home','search','favorites','settings'];
+const STORAGE_KEY = 'naqshband_state_v2';
+const ADMIN_PIN = '313';
+
+/* ========== التواريخ ========== */
+function renderDates(){
+  const now = new Date();
+  const weekday = new Intl.DateTimeFormat('ar-EG',{weekday:'long'}).format(now);
+  const hijri = new Intl.DateTimeFormat('ar-EG-u-ca-islamic-umalqura',{
+    day:'numeric',month:'long',year:'numeric'
+  }).format(now);
+  const greg = new Intl.DateTimeFormat('ar-EG',{
+    day:'numeric',month:'long',year:'numeric'
+  }).format(now);
+  document.getElementById('dateRow').innerHTML =
+    `<span class="date-chip">${weekday}</span><span class="date-chip">${hijri}</span><span class="date-chip">${greg}</span>`;
+}
+
+/* ========== تنسيق الآيات ========== */
+function fmtV(t){
+  return t.replace(/﴿([^﴿]*?)﴾/g,'<span class="verse">﴿$1﴾</span>');
+}
+function stripHtml(t){const d=document.createElement('div');d.innerHTML=t;return d.textContent}
+
+/* ========== التخزين المحلي ========== */
+function applyAdminAdditions(){
+  S.adminAdditions.forEach(a=>{
+    const w=appData.wirds.find(x=>x.id===a.wirdId);
+    if(w&&!w.adhkar.some(x=>x.id===a.id)){
+      w.adhkar.push({id:a.id,text:a.text,count:a.count,admin:true});
+    }
+  });
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify({
+    dark:S.dark,favs:S.favs,prog:S.prog,myWirds:S.myWirds,myProg:S.myProg,adminAdditions:S.adminAdditions
+  }));
+}
+function loadState(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    S.dark=!!saved.dark;
+    S.favs=Array.isArray(saved.favs)?saved.favs:[];
+    S.prog=saved.prog||{};
+    S.myWirds=Array.isArray(saved.myWirds)?saved.myWirds:[];
+    S.myProg=saved.myProg||{};
+    S.adminAdditions=Array.isArray(saved.adminAdditions)?saved.adminAdditions:[];
+    applyAdminAdditions();
+    document.getElementById('phoneFrame').setAttribute('data-theme',S.dark?'dark':'');
+    document.getElementById('darkToggle').classList.toggle('on',S.dark);
+  }catch(e){}
+}
+
+/* ========== حسابات التقدم ========== */
+function wirdTotal(w){return w.adhkar.filter(a=>a.count>1).length}
+function wirdDone(w){return w.adhkar.filter(a=>a.count>1&&(S.prog[a.id]||0)>=a.count).length}
+function wirdComplete(w){return w.adhkar.every(a=>(S.prog[a.id]||0)>=a.count)}
+function totalWirds(){return appData.wirds.filter(w=>w.adhkar.length>0).length}
+function doneWirds(){return appData.wirds.filter(w=>w.adhkar.length>0&&wirdComplete(w)).length}
+
+/* ========== التنقل ========== */
+function navTo(id,hideNav){
+  S.stack.push(id); S.cur=id;
+  const prev=document.querySelector('.screen.active');
+  if(prev) prev.classList.remove('active');
+  const next=document.getElementById('screen-'+id);
+  if(next){next.classList.add('active');next.scrollTop=0}
+  document.getElementById('bottomNav').classList.toggle('hidden',hideNav||!mainTabs.includes(id));
+  if(mainTabs.includes(id)&&!hideNav){
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.s===id));
+  }
+}
+function goBack(){
+  if(S.stack.length>1){
+    S.stack.pop();
+    const prev=S.stack[S.stack.length-1];
+    const curr=S.cur; S.cur=prev;
+    const cEl=document.getElementById('screen-'+curr);
+    if(cEl) cEl.classList.remove('active');
+    const pEl=document.getElementById('screen-'+prev);
+    if(pEl){pEl.classList.add('active');pEl.scrollTop=0}
+    document.getElementById('bottomNav').classList.toggle('hidden',!mainTabs.includes(prev));
+    if(mainTabs.includes(prev)){
+      document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.s===prev));
+    }
+    if(prev==='home') renderHome();
+    if(prev==='favorites') renderFavs();
+    if(prev==='mywird') renderMyWirds();
+  }
+}
+function tab(id){
+  S.stack=[id]; S.cur=id;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  document.getElementById('screen-'+id).scrollTop=0;
+  document.getElementById('bottomNav').classList.remove('hidden');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.s===id));
+  if(id==='home') renderHome();
+  if(id==='favorites') renderFavs();
+  if(id==='mywird') renderMyWirds();
+  if(id==='search'){document.getElementById('searchInput').value='';renderEmptySearch()}
+}
+
+/* ========== الرئيسية ========== */
+function renderHome(){
+  renderDates();
+  const total=totalWirds(), done=doneWirds();
+  const pct=total>0?Math.round(done/total*100):0;
+  const circ=2*Math.PI*38;
+  const homeRing=document.getElementById('homeRing');
+  if(homeRing){
+    homeRing.style.strokeDashoffset=circ*(1-pct/100);
+    document.getElementById('homePNum').textContent=done;
+    document.getElementById('homePDesc').textContent=`أكملت ${done} من ${total} ورد`;
+  }
+
+  const grid=document.getElementById('wirdCards');
+  grid.innerHTML='';
+  appData.wirds.forEach(w=>{
+    const hasContent=w.adhkar.length>0;
+
+    const card=document.createElement('div');
+    card.className='wird-main-card'+(hasContent?'':' disabled');
+    if(hasContent) card.onclick=()=>openWird(w);
+    card.innerHTML=`
+      <div class="wird-card-icon">
+        <span class="material-symbols-rounded">${hasContent?'menu_book':'schedule'}</span>
+      </div>
+      <div class="wird-card-info">
+        <h4>${w.name}</h4>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ========== فتح ورد ========== */
+function openWird(w){
+  S.selWird=w;
+  document.getElementById('wirdTitle').textContent=w.name;
+  renderAdhkar();
+  navTo('wird',true);
+  requestAnimationFrame(updateReadingProgress);
+}
+
+function renderAdhkar(){
+  const w=S.selWird; if(!w) return;
+  const list=document.getElementById('adhkarList');
+  list.innerHTML='';
+  w.adhkar.forEach((a,i)=>{
+    const cur=S.prog[a.id]||0;
+    const isDone=cur>=a.count;
+    const showC=a.count>1;
+    const favActive=isFavPart(w.id,a.id);
+    const circ=2*Math.PI*22;
+    const off=showC?circ*(1-Math.min(cur/a.count,1)):0;
+
+    const item=document.createElement('div');
+    item.className='adhkar-item'+(isDone?' completed-adhkar':'');
+    item.innerHTML=`
+      <div class="adhkar-text">${fmtV(a.text)}</div>
+      <div class="adhkar-actions">
+        <div class="adhkar-left">
+          <button class="copy-btn" onclick="event.stopPropagation();copyTxt(this)" data-text="${a.text.replace(/"/g,'&quot;')}" aria-label="نسخ">
+            <span class="material-symbols-rounded">content_copy</span>
+          </button>
+          <button class="copy-btn ${favActive?'fav-active':''}" onclick="event.stopPropagation();toggleFavPart('${w.id}','${a.id}')" aria-label="إضافة للمفضلة">
+            <span class="material-symbols-rounded">favorite</span>
+          </button>
+          ${showC?`<span class="adhkar-count-label">${cur} / ${a.count}</span>`:''}
+        </div>
+        ${showC?`
+          <button class="counter-circle ${isDone?'done':''}" onclick="incCounter('${a.id}',${a.count})" aria-label="زيادة العداد">
+            <svg class="counter-ring" width="52" height="52" viewBox="0 0 52 52">
+              <circle class="ring-bg" cx="26" cy="26" r="22"/>
+              <circle class="ring-fill" cx="26" cy="26" r="22" stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"/>
+            </svg>
+            <span class="counter-num">${isDone?'<span class="material-symbols-rounded" style="font-size:22px">check</span>':cur}</span>
+          </button>
+        `:`
+          <button class="counter-circle complete-btn ${isDone?'done':''}" onclick="completeOnce('${a.id}')" aria-label="تمت القراءة">
+            <span class="counter-num"><span class="material-symbols-rounded" style="font-size:22px">check</span></span>
+          </button>
+        `}
+      </div>
+    `;
+    list.appendChild(item);
+  });
+  requestAnimationFrame(updateReadingProgress);
+}
+
+function updateReadingProgress(){
+  const screen=document.getElementById('screen-wird');
+  const bar=document.getElementById('wirdPBar');
+  if(!screen||!bar) return;
+  const max=Math.max(0,screen.scrollHeight-screen.clientHeight);
+  const pct=max>0?Math.min(100,Math.max(0,screen.scrollTop/max*100)):0;
+  bar.style.width=pct+'%';
+}
+
+function incCounter(id,max){
+  if(!S.prog[id]) S.prog[id]=0;
+  if(S.prog[id]<max){
+    S.prog[id]++;
+    saveState();
+    renderAdhkar();
+    if(S.selWird&&wirdComplete(S.selWird)) showToast('تم إكمال الورد بنجاح');
+  }
+}
+function completeOnce(id){
+  if((S.prog[id]||0)>=1) return;
+  S.prog[id]=1;
+  saveState();
+  renderAdhkar();
+}
+
+/* ========== النسخ ========== */
+function copyTxt(btn){
+  const text=btn.getAttribute('data-text');
+  navigator.clipboard.writeText(text).then(()=>showToast('تم نسخ النص')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    showToast('تم نسخ النص');
+  });
+}
+
+/* ========== المفضلة ========== */
+function favKey(wirdId,adhkarId){return wirdId+'::'+adhkarId}
+function isFavPart(wirdId,adhkarId){return S.favs.includes(favKey(wirdId,adhkarId))}
+function findFav(key){
+  const [wirdId,adhkarId]=key.split('::');
+  const w=appData.wirds.find(x=>x.id===wirdId);
+  const a=w?w.adhkar.find(x=>x.id===adhkarId):null;
+  return w&&a?{w,a}:null;
+}
+function toggleFavPart(wirdId,adhkarId){
+  const key=favKey(wirdId,adhkarId);
+  const i=S.favs.indexOf(key);
+  if(i>-1){S.favs.splice(i,1);showToast('تمت الإزالة من المفضلة')}
+  else{S.favs.push(key);showToast('تمت الإضافة للمفضلة')}
+  saveState();
+  renderAdhkar();
+}
+function renderFavs(){
+  const c=document.getElementById('favList');c.innerHTML='';
+  const validFavs=S.favs.map(key=>({key,found:findFav(key)})).filter(x=>x.found);
+  if(!validFavs.length){c.innerHTML='<div class="empty-state"><span class="material-symbols-rounded">favorite_border</span><p>لا توجد أجزاء في المفضلة<br>اضغط على القلب بجوار أي ذكر لإضافته</p></div>';return}
+  validFavs.forEach(({key,found})=>{
+    const {w,a}=found;
+    const card=document.createElement('div');card.className='fav-card';
+    card.innerHTML=`
+      <span class="material-symbols-rounded fav-icon">favorite</span>
+      <div class="fav-info">
+        <div class="fav-cat">${w.name}</div>
+        <h4>جزء محفوظ</h4>
+        <p>${a.text.substring(0,130)}${a.text.length>130?'...':''}</p>
+      </div>
+      <button class="fav-remove" onclick="event.stopPropagation();removeFav('${key}')" aria-label="إزالة"><span class="material-symbols-rounded" style="font-size:20px">close</span></button>
+    `;
+    card.onclick=()=>openWird(w);
+    c.appendChild(card);
+  });
+}
+function removeFav(key){const i=S.favs.indexOf(key);if(i>-1)S.favs.splice(i,1);saveState();renderFavs();showToast('تمت الإزالة من المفضلة')}
+
+/* ========== الإدارة المخفية ========== */
+function renderMyWirds(){
+  const list=document.getElementById('myWirdList');list.innerHTML='';
+  if(!S.adminAdditions.length){list.innerHTML='<div class="empty-state"><span class="material-symbols-rounded">add_notes</span><p>لا توجد إضافات محفوظة<br>اضغط على زر + لإضافة ذكر جديد</p></div>';return}
+  S.adminAdditions.forEach((a,i)=>{
+    const w=appData.wirds.find(x=>x.id===a.wirdId);
+    const card=document.createElement('div');card.className='my-wird-card';
+    card.innerHTML=`
+      <div class="my-wird-info"><h4>${w?w.name:'قسم غير معروف'}</h4><p>${a.text}</p></div>
+      <div class="my-wird-count">${a.count>1?a.count+' مرات':'مرة واحدة'}</div>
+      <button class="delete-wird-btn" onclick="delMy(${i})" aria-label="حذف"><span class="material-symbols-rounded" style="font-size:20px">delete</span></button>
+    `;
+    list.appendChild(card);
+  });
+}
+function addWird(e){
+  e.preventDefault();
+  const wirdId=document.getElementById('nwWird').value;
+  const text=document.getElementById('nwText').value.trim();
+  const count=parseInt(document.getElementById('nwCount').value)||1;
+  let ok=true;
+  document.getElementById('errText').classList.remove('show');
+  if(!text){document.getElementById('errText').classList.add('show');ok=false}
+  if(!ok) return false;
+  const item={id:'admin_'+Date.now(),wirdId,text,count:Math.max(1,count)};
+  S.adminAdditions.push(item);
+  applyAdminAdditions();
+  saveState();
+  document.getElementById('addForm').reset();document.getElementById('nwCount').value=1;
+  showToast('تم حفظ الذكر بنجاح');goBack();return false;
+}
+function delMy(i){
+  const item=S.adminAdditions[i];if(!item) return;
+  const w=appData.wirds.find(x=>x.id===item.wirdId);
+  if(w) w.adhkar=w.adhkar.filter(a=>a.id!==item.id);
+  delete S.prog[item.id];
+  S.favs=S.favs.filter(key=>!key.endsWith('::'+item.id));
+  S.adminAdditions.splice(i,1);
+  saveState();
+  renderMyWirds();showToast('تم حذف الذكر')
+}
+
+/* ========== البحث ========== */
+function doSearch(){
+  const q=document.getElementById('searchInput').value.trim();
+  if(!q){renderEmptySearch();return}
+  const res=[];
+  appData.wirds.forEach(w=>{
+    w.adhkar.forEach(a=>{
+      if(a.text.includes(q)) res.push({...a,wirdName:w.name,wirdId:w.id});
+    });
+  });
+  const c=document.getElementById('searchResults');
+  if(!res.length){c.innerHTML=`<div class="empty-state"><span class="material-symbols-rounded">search_off</span><p>لا توجد نتائج لـ"${q}"<br>جرب كلمات مختلفة</p></div>`;return}
+  c.innerHTML='<div class="search-results">'+res.map(r=>{
+    const hl=r.text.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','g'),'<mark>$1</mark>');
+    return `<div class="search-result-item" onclick="goToWird('${r.wirdId}')"><div class="result-cat">${r.wirdName}</div><div class="result-text">${hl.substring(0,150)}...</div></div>`;
+  }).join('')+'</div>';
+}
+function renderEmptySearch(){document.getElementById('searchResults').innerHTML='<div class="empty-state"><span class="material-symbols-rounded">search</span><p>ابحث عن أي ذكر في الأوراد<br>اكتب كلمة أو جزء من النص</p></div>'}
+function goToWird(id){const w=appData.wirds.find(x=>x.id===id);if(w&&w.adhkar.length) openWird(w)}
+
+/* ========== الوضع الليلي ========== */
+function toggleDark(){
+  S.dark=!S.dark;
+  document.getElementById('phoneFrame').setAttribute('data-theme',S.dark?'dark':'');
+  document.getElementById('darkToggle').classList.toggle('on',S.dark);
+  saveState();
+}
+
+/* ========== إعادة تعيين ========== */
+function resetProg(){S.prog={};S.myProg={};saveState();renderHome();showToast('تم إعادة تعيين التقدم')}
+
+/* ========== محاكاة التحديث ========== */
+function simUpdate(){
+  const bar=document.getElementById('updateBar'),fill=document.getElementById('updateFill');
+  bar.classList.add('show');fill.style.width='0%';
+  let p=0;
+  const iv=setInterval(()=>{
+    p+=Math.random()*25+5;
+    if(p>=100){p=100;clearInterval(iv);setTimeout(()=>{bar.classList.remove('show');fill.style.width='0%';showToast('البيانات محدثة')},500)}
+    fill.style.width=p+'%';
+  },300);
+}
+
+/* ========== إشعار ========== */
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2000)}
+
+/* ========== دخول الإدارة المخفية ========== */
+function openAdminFromHash(){
+  if(location.hash!=='#admin') return;
+  const pin=prompt('رمز الإدارة');
+  if(pin===ADMIN_PIN){
+    renderMyWirds();
+    navTo('mywird',true);
+    showToast('تم فتح قسم الإدارة');
+  }else{
+    location.hash='';
+    showToast('رمز الإدارة غير صحيح');
+  }
+}
+window.addEventListener('hashchange',openAdminFromHash);
+
+/* ========== التشغيل ========== */
+loadState();
+document.getElementById('screen-wird').addEventListener('scroll',updateReadingProgress,{passive:true});
+setTimeout(()=>{document.getElementById('splashScreen').classList.add('hide');renderHome();openAdminFromHash()},1600);
+</script>
+</body>
+</html>
