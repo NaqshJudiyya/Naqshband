@@ -393,7 +393,6 @@
           <h4>حساب ذِكر الموافَقة</h4>
           <p>حساب الجمل والأسماء الحسنى</p>
         </div>
-        <div class="muwafaqa-arrow"><span class="material-symbols-rounded">chevron_back</span></div>
       </div>
     </div>
 
@@ -508,11 +507,9 @@
         <div class="settings-list">
           <button class="setting-item" onclick="simUpdate()">
             <div class="setting-item-right"><span class="material-symbols-rounded">sync</span><span>التحقق من التحديثات</span></div>
-            <div class="setting-item-left"><span class="material-symbols-rounded">chevron_back</span></div>
           </button>
           <button class="setting-item" onclick="resetProg()">
             <div class="setting-item-right"><span class="material-symbols-rounded">restart_alt</span><span>إعادة تعيين كل التقدم</span></div>
-            <div class="setting-item-left"><span class="material-symbols-rounded">chevron_back</span></div>
           </button>
         </div>
       </div>
@@ -888,7 +885,6 @@ function renderHome(){
     card.innerHTML=`
       <div class="wird-card-icon"><span class="material-symbols-rounded">${hasContent?'menu_book':'schedule'}</span></div>
       <div class="wird-card-info"><h4>${w.name}</h4></div>
-      ${hasContent?'<div class="wird-card-arrow"><span class="material-symbols-rounded">chevron_back</span></div>':''}
     `;
     grid.appendChild(card);
   });
